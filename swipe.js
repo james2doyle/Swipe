@@ -31,6 +31,8 @@ function Swipe(container, options) {
   var slides, slidePos, width, length;
   options = options || {};
   var index = parseInt(options.startSlide, 10) || 0;
+  var position = index;
+  var clonedSlides = false;
   var speed = options.speed || 300;
   options.continuous = options.continuous !== undefined ? options.continuous : true;
 
@@ -48,6 +50,7 @@ function Swipe(container, options) {
       element.appendChild(slides[0].cloneNode(true));
       element.appendChild(element.children[1].cloneNode(true));
       slides = element.children;
+      clonedSlides = true;
     }
 
     // create an array to store current positions of each slide
@@ -149,7 +152,8 @@ function Swipe(container, options) {
     }
 
     index = to;
-    offloadFn(options.callback && options.callback(index, slides[index]));
+    position = clonedSlides ? (index % 2) : index;
+    offloadFn(options.callback && options.callback(position, slides[index]));
   }
 
   function move(index, dist, speed) {
@@ -201,7 +205,7 @@ function Swipe(container, options) {
 
         if (delay) begin();
 
-        options.transitionEnd && options.transitionEnd.call(event, index, slides[index]);
+        options.transitionEnd && options.transitionEnd.call(event, position, slides[index]);
 
         clearInterval(timer);
         return;
@@ -398,7 +402,8 @@ function Swipe(container, options) {
 
           }
 
-          options.callback && options.callback(index, slides[index]);
+          position = clonedSlides ? (index % 2) : index;
+          options.callback && options.callback(position, slides[index]);
 
         } else {
 
@@ -430,7 +435,7 @@ function Swipe(container, options) {
 
         if (delay) begin();
 
-        options.transitionEnd && options.transitionEnd.call(event, index, slides[index]);
+        options.transitionEnd && options.transitionEnd.call(event, position, slides[index]);
 
       }
 
@@ -508,7 +513,7 @@ function Swipe(container, options) {
     getPos: function() {
 
       // return current index position
-      return index;
+      return position;
 
     },
     getNumSlides: function() {
